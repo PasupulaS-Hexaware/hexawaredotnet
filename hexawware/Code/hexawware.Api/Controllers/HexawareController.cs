@@ -7,6 +7,7 @@ namespace hexawware.Api.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    
     public class HexawareController : ControllerBase
     {
         IHexawareService _HexawareService;
