@@ -1,0 +1,23 @@
+FROM mcr.microsoft.com/dotnet/aspnet:3.1 AS base
+WORKDIR /app
+EXPOSE 80
+
+FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build
+WORKDIR /src
+COPY ["Code/hexawware.Api/hexawware.Api.csproj", "Code/hexawware.Api/"]
+COPY ["Code/hexawware.Business/hexawware.Business.csproj", "Code/hexawware.Business/"]
+COPY ["Code/hexawware.Data/hexawware.Data.csproj", "Code/hexawware.Data/"]
+COPY ["Code/hexawware.Entities/hexawware.Entities.csproj", "Code/hexawware.Entities/"]
+COPY ["Code/hexawware.Test.Api/hexawware.Test.Api.csproj", "Code/hexawware.Test.Api/"]
+COPY ["Code/hexawware.Test.Business/hexawware.Test.Business.csproj", "Code/hexawware.Test.Business/"]
+RUN dotnet restore "Code/hexawware.Api/hexawware.Api.csproj"
+COPY . .
+WORKDIR "/src/Code/hexawware.Api"
+RUN dotnet build "hexawware.Api.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "hexawware.Api.csproj" -c Release -o /app/publish
+
+WORKDIR /src
+RUN dotnet test --results-directory /testresults --logger "trx;LogFileName=testresults.Api.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=/testresults/coverage/ /p:MergeWith=/testresults/coverage/coverage.json "Code/hexawware.Test.Api/hexawware.Test.Api.csproj"
+RUN dotnet test --results-directory /testresults --logger "trx;LogFileName=testresults.Api.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=/testresults/coverage/ /p:MergeWith=/testresults/coverage/coverage.json "Code/hexawware.Test.Business/hexawware.Test.Business.csproj"
