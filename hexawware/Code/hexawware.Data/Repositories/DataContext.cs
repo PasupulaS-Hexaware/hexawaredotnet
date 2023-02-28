@@ -1,4 +1,4 @@
-using hexawware.Entities.Entities
+using hexawware.Entities.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
